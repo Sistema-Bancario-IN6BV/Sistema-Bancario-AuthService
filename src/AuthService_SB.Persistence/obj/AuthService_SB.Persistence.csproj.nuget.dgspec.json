@@ -1,20 +1,82 @@
 {
   "format": 1,
   "restore": {
-    "C:\\AuthService_SB\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {}
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {}
   },
   "projects": {
-    "C:\\AuthService_SB\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\AuthService_SB\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
-        "projectName": "AuthService_SB.Persistence",
-        "projectPath": "C:\\AuthService_SB\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
-        "packagesPath": "C:\\Users\\Cambiar Nombre\\.nuget\\packages\\",
-        "outputPath": "C:\\AuthService_SB\\AuthService_SB.Persistence\\obj\\",
+        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
+        "projectName": "AuthService_SB.Application",
+        "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
+        "packagesPath": "C:\\Users\\Marlon Perez\\.nuget\\packages\\",
+        "outputPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Cambiar Nombre\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Marlon Perez\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
+                "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.418/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
+        "projectName": "AuthService_SB.Domain",
+        "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
+        "packagesPath": "C:\\Users\\Marlon Perez\\.nuget\\packages\\",
+        "outputPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Marlon Perez\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -26,6 +88,71 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.418/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
+        "projectName": "AuthService_SB.Persistence",
+        "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
+        "packagesPath": "C:\\Users\\Marlon Perez\\.nuget\\packages\\",
+        "outputPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Marlon Perez\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
+                "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj"
+              },
+              "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
+                "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
