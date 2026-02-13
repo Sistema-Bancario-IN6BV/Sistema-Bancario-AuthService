@@ -7876,11 +7876,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Api\\AuthService_SB.Api.csproj",
+      "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Api\\AuthService_SB.Api.csproj",
       "projectName": "AuthService_SB.Api",
-      "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Api\\AuthService_SB.Api.csproj",
+      "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Api\\AuthService_SB.Api.csproj",
       "packagesPath": "C:\\Users\\Marlon Perez\\.nuget\\packages\\",
-      "outputPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Api\\obj\\",
+      "outputPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Marlon Perez\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -7895,11 +7895,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
-              "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj"
+            "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
+              "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj"
             },
-            "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {
-              "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj"
+            "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {
+              "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj"
             }
           }
         }
