@@ -21,14 +21,34 @@ public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         // Get user's role (assumes single role per user)
-        var role = user.UserRoles?.FirstOrDefault()?.Role?.Name ?? "USER_ROLE";
+        var role = user.UserRoles?.FirstOrDefault()?.Role?.Name ?? "CUSTOMER";
+
+        // Build full name
+        var fullName = $"{user.Name} {user.Surname}".Trim();
+
+        // Get phone from profile if exists
+        var phone = user.UserProfile?.Phone ?? "";
 
         var claims = new[]
         {
+            // Standard JWT claims
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
-            new Claim("role", role)
+            
+            // Custom claims for application
+            new Claim("role", role),
+            new Claim("email", user.Email),
+            new Claim("username", user.Username),
+            new Claim("name", fullName),
+            new Claim("phone", phone),
+            new Claim("status", user.Status.ToString().ToLower()),
+            
+            // Datos específicos por sistema (restaurantes y banco)
+            // TODO: Agregar restaurantId para RESTAURANT_ADMIN cuando sea necesario
+            // TODO: Agregar accountNumber para CLIENT cuando sea necesario
+            // new Claim("restaurantId", "restaurant-id"),
+            // new Claim("accountNumber", "account-number"),
         };
 
         var token = new JwtSecurityToken(
