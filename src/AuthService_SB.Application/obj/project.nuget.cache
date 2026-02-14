@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7ZAvvxe8GSY=",
+  "dgSpecHash": "IdyOmUvMly8=",
   "success": true,
-  "projectFilePath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
+  "projectFilePath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Marlon Perez\\.nuget\\packages\\bouncycastle.cryptography\\2.6.1\\bouncycastle.cryptography.2.6.1.nupkg.sha512",
     "C:\\Users\\Marlon Perez\\.nuget\\packages\\cloudinarydotnet\\1.28.0\\cloudinarydotnet.1.28.0.nupkg.sha512",

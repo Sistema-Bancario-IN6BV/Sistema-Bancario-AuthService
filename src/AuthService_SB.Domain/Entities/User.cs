@@ -32,6 +32,13 @@ public class User
 
     public bool Status { get; set; } = false;
 
+    // Account lockout fields
+    public int FailedLoginAttempts { get; set; } = 0;
+    
+    public DateTime? LockoutEndTime { get; set; } = null;
+    
+    public DateTime? AccountLockedAt { get; set; } = null;
+
     [Required]
     public DateTime CreatedAt { get; set; }
 
@@ -42,5 +49,8 @@ public class User
     public ICollection<UserRole> UserRoles { get; set; } = [];
     public UserEmail UserEmail { get; set; } = null!;
     public UserPasswordReset UserPasswordReset { get; set; } = null!;
+
+    // Helper property to check if account is currently locked
+    public bool IsLockedOut => LockoutEndTime.HasValue && LockoutEndTime > DateTime.UtcNow;
 
 }

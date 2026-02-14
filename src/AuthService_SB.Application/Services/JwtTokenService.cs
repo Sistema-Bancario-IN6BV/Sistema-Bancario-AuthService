@@ -1,4 +1,5 @@
 using AuthService_SB.Application.Interfaces;
+using AuthService_SB.Domain.Constants;
 using AuthService_SB.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,7 +22,7 @@ public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         // Get user's role (assumes single role per user)
-        var role = user.UserRoles?.FirstOrDefault()?.Role?.Name ?? "CUSTOMER";
+        var role = user.UserRoles?.FirstOrDefault()?.Role?.Name ?? RoleConstants.USER_ROLE;
 
         // Build full name
         var fullName = $"{user.Name} {user.Surname}".Trim();
@@ -44,10 +45,8 @@ public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
             new Claim("phone", phone),
             new Claim("status", user.Status.ToString().ToLower()),
             
-            // Datos específicos por sistema (restaurantes y banco)
-            // TODO: Agregar restaurantId para RESTAURANT_ADMIN cuando sea necesario
+            // Datos específicos por sistema (banco)
             // TODO: Agregar accountNumber para CLIENT cuando sea necesario
-            // new Claim("restaurantId", "restaurant-id"),
             // new Claim("accountNumber", "account-number"),
         };
 

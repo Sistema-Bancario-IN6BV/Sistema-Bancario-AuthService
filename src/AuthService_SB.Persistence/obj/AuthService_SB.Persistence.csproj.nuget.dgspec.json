@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {}
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {}
   },
   "projects": {
-    "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
+        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
         "projectName": "AuthService_SB.Application",
-        "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
+        "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj",
         "packagesPath": "C:\\Users\\Marlon Perez\\.nuget\\packages\\",
-        "outputPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\obj\\",
+        "outputPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Marlon Perez\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,8 +26,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
-                "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
+              "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
+                "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
               }
             }
           }
@@ -104,14 +104,14 @@
         }
       }
     },
-    "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
+        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
         "projectName": "AuthService_SB.Domain",
-        "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
+        "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
         "packagesPath": "C:\\Users\\Marlon Perez\\.nuget\\packages\\",
-        "outputPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\obj\\",
+        "outputPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Marlon Perez\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -162,14 +162,14 @@
         }
       }
     },
-    "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {
+    "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
+        "projectUniqueName": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
         "projectName": "AuthService_SB.Persistence",
-        "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
+        "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
         "packagesPath": "C:\\Users\\Marlon Perez\\.nuget\\packages\\",
-        "outputPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Persistence\\obj\\",
+        "outputPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Marlon Perez\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -184,11 +184,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
-                "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj"
+              "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
+                "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj"
               },
-              "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
-                "projectPath": "C:\\gitIN6BV2026\\Sistema-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
+              "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
+                "projectPath": "C:\\gitIN6BV2026\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
               }
             }
           }
