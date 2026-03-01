@@ -108,4 +108,101 @@ public class AuthController(IAuthService authService) : ControllerBase
         var result = await authService.ResetPasswordAsync(resetPasswordDto);
         return Ok(result);
     }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    public async Task<ActionResult<object>> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+        if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            return Unauthorized();
+        }
+
+        // Validar que las contraseñas coincidan
+        if (changePasswordDto.NewPassword != changePasswordDto.ConfirmPassword)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Las contraseñas nuevas no coinciden"
+            });
+        }
+
+        var result = await authService.ChangePasswordAsync(userIdClaim.Value, changePasswordDto);
+        if (!result)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Error al cambiar la contraseña"
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "Contraseña actualizada exitosamente"
+        });
+    }
+
+    [HttpPut("profile")]
+    [Authorize]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    [EnableRateLimiting("ApiPolicy")]
+    public async Task<ActionResult<object>> UpdateProfile([FromForm] UpdateUserProfileDto updateUserProfileDto)
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+        if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            return Unauthorized();
+        }
+
+        var user = await authService.UpdateUserProfileAsync(userIdClaim.Value, updateUserProfileDto);
+        if (user == null)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Error al actualizar el perfil"
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "Perfil actualizado exitosamente",
+            data = user
+        });
+    }
+
+    [HttpPut("client-profile")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    public async Task<ActionResult<object>> UpdateClientProfile([FromBody] UpdateClientProfileDto updateClientProfileDto)
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+        if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            return Unauthorized();
+        }
+
+        var user = await authService.UpdateClientProfileAsync(userIdClaim.Value, updateClientProfileDto);
+        if (user == null)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Error al actualizar el perfil"
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "Perfil del cliente actualizado exitosamente",
+            data = user
+        });
+    }
 }

@@ -26,21 +26,17 @@ public class AuthService(
     private readonly ICloudinaryService _cloudinaryService = cloudinaryService;
     public async Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto)
     {
-        // Verificar si el email ya existe
         if (await userRepository.ExistsByEmailAsync(registerDto.Email))
         {
             logger.LogRegistrationWithExistingEmail();
             throw new BusinessException(ErrorCodes.EMAIL_ALREADY_EXISTS, "Email already exists");
         }
-
-        // Verificar si el username ya existe
         if (await userRepository.ExistsByUsernameAsync(registerDto.Username))
         {
             logger.LogRegistrationWithExistingUsername();
             throw new BusinessException(ErrorCodes.USERNAME_ALREADY_EXISTS, "Username already exists");
         }
 
-        // Validar y manejar la imagen de perfil
         string profilePicturePath;
 
         if (registerDto.ProfilePicture != null && registerDto.ProfilePicture.Size > 0)
@@ -68,7 +64,6 @@ public class AuthService(
             profilePicturePath = _cloudinaryService.GetDefaultAvatarUrl();
         }
 
-        // Crear nuevo usuario y entidades relacionadas
         var emailVerificationToken = TokenGeneratorService.GenerateEmailVerificationToken();
 
         var userId = UuidGenerator.GenerateUserId();
@@ -76,7 +71,6 @@ public class AuthService(
         var userEmailId = UuidGenerator.GenerateUserId();
         var userRoleId = UuidGenerator.GenerateUserId();
 
-        // Obtener el rol por defecto (USER_ROLE) ya seedado en DB
         var defaultRole = await roleRepository.GetByNameAsync(RoleConstants.USER_ROLE);
         if (defaultRole == null)
         {
@@ -97,7 +91,11 @@ public class AuthService(
                 Id = userProfileId,
                 UserId = userId,
                 ProfilePicture = profilePicturePath,
-                Phone = registerDto.Phone
+                Phone = registerDto.Phone,
+                Dpi = registerDto.Dpi,
+                Address = registerDto.Address,
+                JobName = registerDto.JobName,
+                MonthlyIncome = registerDto.MonthlyIncome
             },
             UserEmail = new UserEmail
             {
@@ -144,7 +142,6 @@ public class AuthService(
             }
         });
 
-        // Crear respuesta sin JWT - solo confirmación de registro
         return new RegisterResponseDto
         {
             Success = true,
@@ -181,7 +178,7 @@ public class AuthService(
         if (!user.Status)
         {
             logger.LogFailedLoginAttempt();
-            throw new UnauthorizedAccessException("User account is disabled");
+            throw new BusinessException(ErrorCodes.USER_NOT_VERIFIED, "Debes verificar tu correo electrónico antes de iniciar sesión");
         }
 
         // Verificar contraseña
@@ -220,6 +217,10 @@ public class AuthService(
             Email = user.Email,
             ProfilePicture = _cloudinaryService.GetFullImageUrl(user.UserProfile?.ProfilePicture ?? string.Empty),
             Phone = user.UserProfile?.Phone ?? string.Empty,
+            Dpi = user.UserProfile?.Dpi ?? string.Empty,
+            Address = user.UserProfile?.Address ?? string.Empty,
+            JobName = user.UserProfile?.JobName ?? string.Empty,
+            MonthlyIncome = user.UserProfile?.MonthlyIncome ?? 0,
             Role = userRole,
             Status = user.Status,
             IsEmailVerified = user.UserEmail?.EmailVerified ?? false,
@@ -428,5 +429,295 @@ public class AuthService(
 
         return MapToUserResponseDto(user);
     }
-}
 
+    public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordDto changePasswordDto)
+    {
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new BusinessException(ErrorCodes.USER_NOT_FOUND, "User not found");
+        }
+
+        // Validate current password
+        if (!passwordHashService.VerifyPassword(changePasswordDto.CurrentPassword, user.Password))
+        {
+            throw new BusinessException(ErrorCodes.INVALID_PASSWORD, "Current password is incorrect");
+        }
+
+        // Validate new password matches confirm password
+        if (changePasswordDto.NewPassword != changePasswordDto.ConfirmPassword)
+        {
+            throw new BusinessException(ErrorCodes.PASSWORD_MISMATCH, "New password and confirm password do not match");
+        }
+
+        // Update password
+        user.Password = passwordHashService.HashPassword(changePasswordDto.NewPassword);
+        await userRepository.UpdateAsync(user);
+
+        logger.LogInformation("Password changed successfully for user {Username}", user.Username);
+        return true;
+    }
+
+    public async Task<UserResponseDto?> UpdateUserProfileAsync(string userId, UpdateUserProfileDto updateUserProfileDto)
+    {
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            return null;
+        }
+
+        // Update profile fields
+        if (user.UserProfile != null)
+        {
+            if (!string.IsNullOrEmpty(updateUserProfileDto.Phone))
+            {
+                user.UserProfile.Phone = updateUserProfileDto.Phone;
+            }
+            if (!string.IsNullOrEmpty(updateUserProfileDto.Address))
+            {
+                user.UserProfile.Address = updateUserProfileDto.Address;
+            }
+            if (!string.IsNullOrEmpty(updateUserProfileDto.JobName))
+            {
+                user.UserProfile.JobName = updateUserProfileDto.JobName;
+            }
+            if (updateUserProfileDto.MonthlyIncome > 0)
+            {
+                user.UserProfile.MonthlyIncome = updateUserProfileDto.MonthlyIncome;
+            }
+            if (!string.IsNullOrEmpty(updateUserProfileDto.ProfilePicture))
+            {
+                user.UserProfile.ProfilePicture = updateUserProfileDto.ProfilePicture;
+            }
+        }
+
+        await userRepository.UpdateAsync(user);
+        logger.LogInformation("User profile updated successfully for user {Username}", user.Username);
+
+        return MapToUserResponseDto(user);
+    }
+
+    public async Task<UserResponseDto?> UpdateClientProfileAsync(string userId, UpdateClientProfileDto updateClientProfileDto)
+    {
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            return null;
+        }
+
+        // Update client profile fields
+        user.Name = updateClientProfileDto.Name;
+        user.Surname = updateClientProfileDto.Surname;
+
+        if (user.UserProfile != null)
+        {
+            user.UserProfile.Address = updateClientProfileDto.Address;
+            user.UserProfile.JobName = updateClientProfileDto.JobName;
+            user.UserProfile.MonthlyIncome = updateClientProfileDto.MonthlyIncome;
+        }
+
+        await userRepository.UpdateAsync(user);
+        logger.LogInformation("Client profile updated successfully for user {Username}", user.Username);
+
+        return MapToUserResponseDto(user);
+    }
+
+    public async Task<UserResponseDto?> CreateUserByAdminAsync(CreateUserByAdminDto createUserByAdminDto)
+    {
+        // Verificar si el email ya existe
+        if (await userRepository.ExistsByEmailAsync(createUserByAdminDto.Email))
+        {
+            logger.LogRegistrationWithExistingEmail();
+            throw new BusinessException(ErrorCodes.EMAIL_ALREADY_EXISTS, "Email already exists");
+        }
+
+        // Verificar si el username ya existe
+        if (await userRepository.ExistsByUsernameAsync(createUserByAdminDto.Username))
+        {
+            logger.LogRegistrationWithExistingUsername();
+            throw new BusinessException(ErrorCodes.USERNAME_ALREADY_EXISTS, "Username already exists");
+        }
+
+        // Validar y manejar la imagen de perfil
+        string profilePicturePath;
+
+        if (createUserByAdminDto.ProfilePicture != null && createUserByAdminDto.ProfilePicture.Size > 0)
+        {
+            var (isValid, errorMessage) = FileValidator.ValidateImage(createUserByAdminDto.ProfilePicture);
+            if (!isValid)
+            {
+                logger.LogWarning($"File validation failed: {errorMessage}");
+                throw new BusinessException(ErrorCodes.INVALID_FILE_FORMAT, errorMessage!);
+            }
+
+            try
+            {
+                var fileName = FileValidator.GenerateSecureFileName(createUserByAdminDto.ProfilePicture.FileName);
+                profilePicturePath = await _cloudinaryService.UploadImageAsync(createUserByAdminDto.ProfilePicture, fileName);
+            }
+            catch (Exception)
+            {
+                logger.LogImageUploadError();
+                throw new BusinessException(ErrorCodes.IMAGE_UPLOAD_FAILED, "Failed to upload profile image");
+            }
+        }
+        else
+        {
+            profilePicturePath = _cloudinaryService.GetDefaultAvatarUrl();
+        }
+
+        // Obtener el rol especificado
+        var role = await roleRepository.GetByNameAsync(createUserByAdminDto.RoleName);
+        if (role == null)
+        {
+            throw new BusinessException(ErrorCodes.ROLE_NOT_FOUND, $"Role '{createUserByAdminDto.RoleName}' not found");
+        }
+
+        var userId = UuidGenerator.GenerateUserId();
+        var userProfileId = UuidGenerator.GenerateUserId();
+        var userEmailId = UuidGenerator.GenerateUserId();
+        var userRoleId = UuidGenerator.GenerateUserId();
+
+        // Crear nuevo usuario
+        var user = new User
+        {
+            Id = userId,
+            Name = createUserByAdminDto.Name,
+            Surname = createUserByAdminDto.Surname,
+            Username = createUserByAdminDto.Username,
+            Email = createUserByAdminDto.Email.ToLowerInvariant(),
+            Password = passwordHashService.HashPassword(createUserByAdminDto.Password),
+            Status = true, // Admin-created users are active by default
+            UserProfile = new UserProfile
+            {
+                Id = userProfileId,
+                UserId = userId,
+                ProfilePicture = profilePicturePath,
+                Phone = createUserByAdminDto.Phone,
+                Dpi = createUserByAdminDto.Dpi,
+                Address = createUserByAdminDto.Address,
+                JobName = createUserByAdminDto.JobName,
+                MonthlyIncome = createUserByAdminDto.MonthlyIncome
+            },
+            UserEmail = new UserEmail
+            {
+                Id = userEmailId,
+                UserId = userId,
+                EmailVerified = true, // Admin-created users have verified email
+                EmailVerificationToken = null,
+                EmailVerificationTokenExpiry = null
+            },
+            UserRoles =
+            [
+                new Domain.Entities.UserRole
+                {
+                    Id = userRoleId,
+                    UserId = userId,
+                    RoleId = role.Id
+                }
+            ],
+            UserPasswordReset = new UserPasswordReset
+            {
+                Id = UuidGenerator.GenerateUserId(),
+                UserId = userId,
+                PasswordResetToken = null,
+                PasswordResetTokenExpiry = null
+            }
+        };
+
+        var createdUser = await userRepository.CreateAsync(user);
+        logger.LogUserRegistered(createdUser.Username);
+
+        return MapToUserResponseDto(createdUser);
+    }
+
+    public async Task<UserResponseDto?> UpdateUserByAdminAsync(string userId, UpdateUserByAdminDto updateUserByAdminDto)
+    {
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            return null;
+        }
+
+        // Update basic user fields if provided
+        if (!string.IsNullOrEmpty(updateUserByAdminDto.Name))
+        {
+            user.Name = updateUserByAdminDto.Name;
+        }
+        if (!string.IsNullOrEmpty(updateUserByAdminDto.Surname))
+        {
+            user.Surname = updateUserByAdminDto.Surname;
+        }
+        if (!string.IsNullOrEmpty(updateUserByAdminDto.Email))
+        {
+            user.Email = updateUserByAdminDto.Email.ToLowerInvariant();
+        }
+
+        // Update profile fields if provided
+        if (user.UserProfile != null)
+        {
+            if (!string.IsNullOrEmpty(updateUserByAdminDto.Phone))
+            {
+                user.UserProfile.Phone = updateUserByAdminDto.Phone;
+            }
+            if (!string.IsNullOrEmpty(updateUserByAdminDto.Address))
+            {
+                user.UserProfile.Address = updateUserByAdminDto.Address;
+            }
+            if (!string.IsNullOrEmpty(updateUserByAdminDto.JobName))
+            {
+                user.UserProfile.JobName = updateUserByAdminDto.JobName;
+            }
+            if (updateUserByAdminDto.MonthlyIncome.HasValue && updateUserByAdminDto.MonthlyIncome.Value > 0)
+            {
+                user.UserProfile.MonthlyIncome = updateUserByAdminDto.MonthlyIncome.Value;
+            }
+
+            // Handle profile picture upload if provided
+            if (updateUserByAdminDto.ProfilePicture != null && updateUserByAdminDto.ProfilePicture.Size > 0)
+            {
+                var (isValid, errorMessage) = FileValidator.ValidateImage(updateUserByAdminDto.ProfilePicture);
+                if (!isValid)
+                {
+                    logger.LogWarning($"File validation failed: {errorMessage}");
+                    throw new BusinessException(ErrorCodes.INVALID_FILE_FORMAT, errorMessage!);
+                }
+
+                try
+                {
+                    var fileName = FileValidator.GenerateSecureFileName(updateUserByAdminDto.ProfilePicture.FileName);
+                    var profilePicturePath = await _cloudinaryService.UploadImageAsync(updateUserByAdminDto.ProfilePicture, fileName);
+                    user.UserProfile.ProfilePicture = profilePicturePath;
+                }
+                catch (Exception)
+                {
+                    logger.LogImageUploadError();
+                    throw new BusinessException(ErrorCodes.IMAGE_UPLOAD_FAILED, "Failed to upload profile image");
+                }
+            }
+        }
+
+        await userRepository.UpdateAsync(user);
+        logger.LogInformation("User updated successfully by admin for user {Username}", user.Username);
+
+        return MapToUserResponseDto(user);
+    }
+
+    public async Task<bool> DeleteUserAsync(string userId)
+    {
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        // Soft delete: set Status to false instead of removing from database
+        var result = await userRepository.SetStatusAsync(userId, false);
+        if (result)
+        {
+            logger.LogInformation("User deactivated successfully (soft delete): {UserId}", userId);
+        }
+
+        return result;
+    }
+}
