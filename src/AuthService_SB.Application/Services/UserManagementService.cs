@@ -10,18 +10,14 @@ public class UserManagementService(IUserRepository users, IRoleRepository roles,
 {
     public async Task<UserResponseDto> UpdateUserRoleAsync(string userId, string roleName)
     {
-        // Normalize
         roleName = roleName?.Trim().ToUpperInvariant() ?? string.Empty;
 
-        // Validate inputs
         if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("Invalid userId", nameof(userId));
         if (!RoleConstants.AllowedRoles.Contains(roleName))
             throw new InvalidOperationException($"Role not allowed. Use {RoleConstants.ADMIN_ROLE} or {RoleConstants.USER_ROLE}");
 
-        // Load user with roles
         var user = await users.GetByIdAsync(userId);
 
-        // If demoting an admin, prevent removing last admin
         var isUserAdmin = user.UserRoles.Any(r => r.Role.Name == RoleConstants.ADMIN_ROLE);
         if (isUserAdmin && roleName != RoleConstants.ADMIN_ROLE)
         {
@@ -33,17 +29,13 @@ public class UserManagementService(IUserRepository users, IRoleRepository roles,
             }
         }
 
-        // Find role entity
         var role = await roles.GetByNameAsync(roleName)
                        ?? throw new InvalidOperationException($"Role {roleName} not found");
 
-        // Update role using repository method
         await users.UpdateUserRoleAsync(userId, role.Id);
 
-        // Reload user with updated roles
         user = await users.GetByIdAsync(userId);
 
-        // Map to response
         return new UserResponseDto
         {
             Id = user.Id,
@@ -53,6 +45,10 @@ public class UserManagementService(IUserRepository users, IRoleRepository roles,
             Email = user.Email,
             ProfilePicture = cloudinary.GetFullImageUrl(user.UserProfile?.ProfilePicture ?? string.Empty),
             Phone = user.UserProfile?.Phone ?? string.Empty,
+            Dpi = user.UserProfile?.Dpi ?? string.Empty,
+            Address = user.UserProfile?.Address ?? string.Empty,
+            JobName = user.UserProfile?.JobName ?? string.Empty,
+            MonthlyIncome = user.UserProfile?.MonthlyIncome ?? 0,
             Role = role.Name,
             Status = user.Status,
             IsEmailVerified = user.UserEmail?.EmailVerified ?? false,
@@ -80,6 +76,10 @@ public class UserManagementService(IUserRepository users, IRoleRepository roles,
             Email = u.Email,
             ProfilePicture = cloudinary.GetFullImageUrl(u.UserProfile?.ProfilePicture ?? string.Empty),
             Phone = u.UserProfile?.Phone ?? string.Empty,
+            Dpi = u.UserProfile?.Dpi ?? string.Empty,
+            Address = u.UserProfile?.Address ?? string.Empty,
+            JobName = u.UserProfile?.JobName ?? string.Empty,
+            MonthlyIncome = u.UserProfile?.MonthlyIncome ?? 0,
             Role = roleName,
             Status = u.Status,
             IsEmailVerified = u.UserEmail?.EmailVerified ?? false,

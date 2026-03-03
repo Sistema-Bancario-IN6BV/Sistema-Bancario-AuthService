@@ -1,5 +1,6 @@
 using AuthService_SB.Application.DTOs;
 using AuthService_SB.Application.Interfaces;
+using AuthService_SB.Api.Models;
 using AuthService_SB.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,9 +8,12 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace AuthService_SB.Api.Controllers;
 
+/// <summary>
+/// Endpoints de administración de usuarios y roles.
+/// </summary>
 [ApiController]
 [Route("api/v1/[controller]")]
-public class UsersController(IUserManagementService userManagementService) : ControllerBase
+public class UsersController(IUserManagementService userManagementService, IAuthService authService) : ControllerBase
 {
     private async Task<bool> CurrentUserIsAdmin()
     {
@@ -19,9 +23,172 @@ public class UsersController(IUserManagementService userManagementService) : Con
         return roles.Contains(RoleConstants.ADMIN_ROLE);
     }
 
+    /// <summary>
+    /// Crea un usuario desde la consola administrativa.
+    /// </summary>
+    /// <param name="createUserByAdminDto">Datos del usuario a crear, incluyendo rol y foto opcional.</param>
+    /// <returns>Usuario creado.</returns>
+    [HttpPost]
+    [Authorize]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    [EnableRateLimiting("ApiPolicy")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult<object>> CreateUser([FromForm] CreateUserByAdminDto createUserByAdminDto)
+    {
+        if (!await CurrentUserIsAdmin())
+        {
+            return StatusCode(403, new { success = false, message = "Solo administradores pueden crear usuarios" });
+        }
+
+        var user = await authService.CreateUserByAdminAsync(createUserByAdminDto);
+        if (user == null)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Error al crear el usuario"
+            });
+        }
+
+        return StatusCode(201, new
+        {
+            success = true,
+            message = "Usuario creado exitosamente",
+            data = user
+        });
+    }
+
+    /// <summary>
+    /// Obtiene un usuario por su identificador.
+    /// </summary>
+    /// <param name="userId">Identificador único del usuario.</param>
+    /// <returns>Usuario encontrado.</returns>
+    [HttpGet("{userId}")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult<object>> GetUserById(string userId)
+    {
+        if (!await CurrentUserIsAdmin())
+        {
+            return StatusCode(403, new { success = false, message = "Forbidden" });
+        }
+
+        var user = await authService.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound(new { success = false, message = "Usuario no encontrado" });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "Usuario obtenido exitosamente",
+            data = user
+        });
+    }
+
+    /// <summary>
+    /// Actualiza un usuario como administrador.
+    /// </summary>
+    /// <param name="userId">Identificador del usuario a actualizar.</param>
+    /// <param name="updateUserByAdminDto">Campos permitidos para actualización.</param>
+    /// <returns>Usuario actualizado.</returns>
+    [HttpPut("{userId}")]
+    [Authorize]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    [EnableRateLimiting("ApiPolicy")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult<object>> UpdateUser(string userId, [FromForm] UpdateUserByAdminDto updateUserByAdminDto)
+    {
+        if (!await CurrentUserIsAdmin())
+        {
+            return StatusCode(403, new { success = false, message = "Solo administradores pueden actualizar usuarios" });
+        }
+
+        var user = await authService.UpdateUserByAdminAsync(userId, updateUserByAdminDto);
+        if (user == null)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Error al actualizar el usuario"
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "Usuario actualizado exitosamente",
+            data = user
+        });
+    }
+
+    /// <summary>
+    /// Elimina un usuario por su identificador.
+    /// </summary>
+    /// <param name="userId">Identificador del usuario a eliminar.</param>
+    /// <returns>Resultado de eliminación.</returns>
+    [HttpDelete("{userId}")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+    public async Task<ActionResult<object>> DeleteUser(string userId)
+    {
+        if (!await CurrentUserIsAdmin())
+        {
+            return StatusCode(403, new { success = false, message = "Solo administradores pueden eliminar usuarios" });
+        }
+
+        var result = await authService.DeleteUserAsync(userId);
+        if (!result)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Error al eliminar el usuario"
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "Usuario eliminado exitosamente"
+        });
+    }
+
+    /// <summary>
+    /// Cambia el rol de un usuario.
+    /// </summary>
+    /// <param name="userId">Identificador del usuario.</param>
+    /// <param name="dto">Nuevo rol a asignar.</param>
+    /// <returns>Usuario con el rol actualizado.</returns>
     [HttpPut("{userId}/role")]
     [Authorize]
     [EnableRateLimiting("ApiPolicy")]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<UserResponseDto>> UpdateUserRole(string userId, [FromBody] UpdateUserRoleDto dto)
     {
         if (!await CurrentUserIsAdmin())
@@ -33,17 +200,33 @@ public class UsersController(IUserManagementService userManagementService) : Con
         return Ok(result);
     }
 
+    /// <summary>
+    /// Obtiene los roles asignados a un usuario.
+    /// </summary>
+    /// <param name="userId">Identificador del usuario.</param>
+    /// <returns>Listado de roles del usuario.</returns>
     [HttpGet("{userId}/roles")]
     [Authorize]
+    [ProducesResponseType(typeof(IReadOnlyList<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IReadOnlyList<string>>> GetUserRoles(string userId)
     {
         var roles = await userManagementService.GetUserRolesAsync(userId);
         return Ok(roles);
     }
 
+    /// <summary>
+    /// Lista usuarios filtrados por rol.
+    /// </summary>
+    /// <param name="roleName">Nombre del rol a consultar.</param>
+    /// <returns>Usuarios que pertenecen al rol indicado.</returns>
     [HttpGet("by-role/{roleName}")]
     [Authorize]
     [EnableRateLimiting("ApiPolicy")]
+    [ProducesResponseType(typeof(IReadOnlyList<UserResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<IReadOnlyList<UserResponseDto>>> GetUsersByRole(string roleName)
     {
         if (!await CurrentUserIsAdmin())

@@ -90,6 +90,15 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
         return true;
     }
 
+    public async Task<bool> SetStatusAsync(string id, bool status)
+    {
+        var user = await GetByIdAsync(id);
+        user.Status = status;
+        user.UpdatedAt = DateTime.UtcNow;
+        await context.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<bool> ExistsByEmailAsync(string email)
     {
         return await context.Users
