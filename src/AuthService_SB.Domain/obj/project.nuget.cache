@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UZsMoHd8JAs=",
+  "dgSpecHash": "HNatGOEzKyE=",
   "success": true,
-  "projectFilePath": "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
+  "projectFilePath": "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

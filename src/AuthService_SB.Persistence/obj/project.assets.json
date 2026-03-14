@@ -6583,19 +6583,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ricar\\.nuget\\packages\\": {}
+    "C:\\Users\\denis\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
+      "projectUniqueName": "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
       "projectName": "AuthService_SB.Persistence",
-      "projectPath": "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
-      "packagesPath": "C:\\Users\\ricar\\.nuget\\packages\\",
-      "outputPath": "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\obj\\",
+      "projectPath": "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\AuthService_SB.Persistence.csproj",
+      "packagesPath": "C:\\Users\\denis\\.nuget\\packages\\",
+      "outputPath": "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Persistence\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ricar\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\denis\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -6607,11 +6607,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
-              "projectPath": "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj"
+            "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj": {
+              "projectPath": "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Application\\AuthService_SB.Application.csproj"
             },
-            "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
-              "projectPath": "C:\\2024445\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
+            "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj": {
+              "projectPath": "C:\\ProyectosGitHub\\Sistema-Bancario-AuthService\\src\\AuthService_SB.Domain\\AuthService_SB.Domain.csproj"
             }
           }
         }
@@ -6668,7 +6668,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.418/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.417/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
