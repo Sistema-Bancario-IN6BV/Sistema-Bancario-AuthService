@@ -81,8 +81,8 @@ public class CreateUserByAdminDto
     /// Rol inicial del usuario (por ejemplo, Admin o Client).
     /// </summary>
     [Required(ErrorMessage = "El rol es obligatorio.")]
-    [RegularExpression("^(Admin|Client)$", ErrorMessage = "El rol debe ser 'Admin' o 'Client'")]
-    public string RoleName { get; set; } = string.Empty; // "Admin" o "Client"
+[RegularExpression("^(ADMIN_ROLE|USER_ROLE)$", ErrorMessage = "El rol debe ser 'ADMIN_ROLE' o 'USER_ROLE'")]
+public string RoleName { get; set; } = string.Empty; // "ADMIN_ROLE" o "USER_ROLE"
 
     /// <summary>
     /// Imagen de perfil opcional enviada como archivo.
