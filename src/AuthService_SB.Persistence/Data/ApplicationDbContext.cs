@@ -106,6 +106,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 .HasMaxLength(16);
             entity.Property(e => e.ProfilePicture).HasDefaultValue("");
             entity.Property(e => e.Phone).HasMaxLength(8);
+            entity.HasIndex(e => e.Dpi).IsUnique(); //Evita que dos usuarios tengan el mismo DPI
         });
 
         modelBuilder.Entity<Role>(entity =>

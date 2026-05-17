@@ -523,113 +523,93 @@ public class AuthService(
     }
 
     public async Task<UserResponseDto?> CreateUserByAdminAsync(CreateUserByAdminDto createUserByAdminDto)
+{
+    // 1. Validaciones de existencia (Seguridad de datos)
+    if (await userRepository.ExistsByEmailAsync(createUserByAdminDto.Email))
     {
-        // Verificar si el email ya existe
-        if (await userRepository.ExistsByEmailAsync(createUserByAdminDto.Email))
+        logger.LogWarning("Admin intentó crear usuario con email existente: {Email}", createUserByAdminDto.Email);
+        throw new BusinessException(ErrorCodes.EMAIL_ALREADY_EXISTS, "El correo electrónico ya está registrado.");
+    }
+
+    if (await userRepository.ExistsByUsernameAsync(createUserByAdminDto.Username))
+    {
+        logger.LogWarning("Admin intentó crear usuario con username existente: {Username}", createUserByAdminDto.Username);
+        throw new BusinessException(ErrorCodes.USERNAME_ALREADY_EXISTS, "El nombre de usuario ya está en uso.");
+    }
+
+    // 2. Gestión de la imagen de perfil
+    string profilePicturePath;
+    if (createUserByAdminDto.ProfilePicture != null && createUserByAdminDto.ProfilePicture.Size > 0)
+    {
+        var (isValid, errorMessage) = FileValidator.ValidateImage(createUserByAdminDto.ProfilePicture);
+        if (!isValid) throw new BusinessException(ErrorCodes.INVALID_FILE_FORMAT, errorMessage!);
+
+        var fileName = FileValidator.GenerateSecureFileName(createUserByAdminDto.ProfilePicture.FileName);
+        profilePicturePath = await _cloudinaryService.UploadImageAsync(createUserByAdminDto.ProfilePicture, fileName);
+    }
+    else
+    {
+        profilePicturePath = _cloudinaryService.GetDefaultAvatarUrl();
+    }
+
+    // 3. Validación del Rol
+    var role = await roleRepository.GetByNameAsync(createUserByAdminDto.RoleName);
+    if (role == null)
+    {
+        throw new BusinessException(ErrorCodes.ROLE_NOT_FOUND, $"El rol '{createUserByAdminDto.RoleName}' no existe en el sistema.");
+    }
+
+    // 4. Generación de IDs (Asegúrate que UuidGenerator genere máximo 16 caracteres)
+    var userId = UuidGenerator.GenerateUserId();
+
+    // 5. Creación de la entidad completa
+    var user = new User
+    {
+        Id = userId,
+        Name = createUserByAdminDto.Name,
+        Surname = createUserByAdminDto.Surname,
+        Username = createUserByAdminDto.Username,
+        Email = createUserByAdminDto.Email.ToLowerInvariant(),
+        Password = passwordHashService.HashPassword(createUserByAdminDto.Password),
+        Status = true, // Los usuarios creados por admin se activan de inmediato
+        UserProfile = new UserProfile
         {
-            logger.LogRegistrationWithExistingEmail();
-            throw new BusinessException(ErrorCodes.EMAIL_ALREADY_EXISTS, "Email already exists");
-        }
-
-        // Verificar si el username ya existe
-        if (await userRepository.ExistsByUsernameAsync(createUserByAdminDto.Username))
+            Id = UuidGenerator.GenerateUserId(),
+            UserId = userId,
+            ProfilePicture = profilePicturePath,
+            Phone = createUserByAdminDto.Phone,
+            Dpi = createUserByAdminDto.Dpi,
+            Address = createUserByAdminDto.Address,
+            JobName = createUserByAdminDto.JobName,
+            MonthlyIncome = createUserByAdminDto.MonthlyIncome
+        },
+        UserEmail = new UserEmail
         {
-            logger.LogRegistrationWithExistingUsername();
-            throw new BusinessException(ErrorCodes.USERNAME_ALREADY_EXISTS, "Username already exists");
-        }
-
-        // Validar y manejar la imagen de perfil
-        string profilePicturePath;
-
-        if (createUserByAdminDto.ProfilePicture != null && createUserByAdminDto.ProfilePicture.Size > 0)
+            Id = UuidGenerator.GenerateUserId(),
+            UserId = userId,
+            EmailVerified = true, // No necesitan verificar correo si los crea el admin
+        },
+        UserRoles = new List<Domain.Entities.UserRole>
         {
-            var (isValid, errorMessage) = FileValidator.ValidateImage(createUserByAdminDto.ProfilePicture);
-            if (!isValid)
-            {
-                logger.LogWarning($"File validation failed: {errorMessage}");
-                throw new BusinessException(ErrorCodes.INVALID_FILE_FORMAT, errorMessage!);
-            }
-
-            try
-            {
-                var fileName = FileValidator.GenerateSecureFileName(createUserByAdminDto.ProfilePicture.FileName);
-                profilePicturePath = await _cloudinaryService.UploadImageAsync(createUserByAdminDto.ProfilePicture, fileName);
-            }
-            catch (Exception)
-            {
-                logger.LogImageUploadError();
-                throw new BusinessException(ErrorCodes.IMAGE_UPLOAD_FAILED, "Failed to upload profile image");
-            }
-        }
-        else
-        {
-            profilePicturePath = _cloudinaryService.GetDefaultAvatarUrl();
-        }
-
-        // Obtener el rol especificado
-        var role = await roleRepository.GetByNameAsync(createUserByAdminDto.RoleName);
-        if (role == null)
-        {
-            throw new BusinessException(ErrorCodes.ROLE_NOT_FOUND, $"Role '{createUserByAdminDto.RoleName}' not found");
-        }
-
-        var userId = UuidGenerator.GenerateUserId();
-        var userProfileId = UuidGenerator.GenerateUserId();
-        var userEmailId = UuidGenerator.GenerateUserId();
-        var userRoleId = UuidGenerator.GenerateUserId();
-
-        // Crear nuevo usuario
-        var user = new User
-        {
-            Id = userId,
-            Name = createUserByAdminDto.Name,
-            Surname = createUserByAdminDto.Surname,
-            Username = createUserByAdminDto.Username,
-            Email = createUserByAdminDto.Email.ToLowerInvariant(),
-            Password = passwordHashService.HashPassword(createUserByAdminDto.Password),
-            Status = true, // Admin-created users are active by default
-            UserProfile = new UserProfile
-            {
-                Id = userProfileId,
-                UserId = userId,
-                ProfilePicture = profilePicturePath,
-                Phone = createUserByAdminDto.Phone,
-                Dpi = createUserByAdminDto.Dpi,
-                Address = createUserByAdminDto.Address,
-                JobName = createUserByAdminDto.JobName,
-                MonthlyIncome = createUserByAdminDto.MonthlyIncome
-            },
-            UserEmail = new UserEmail
-            {
-                Id = userEmailId,
-                UserId = userId,
-                EmailVerified = true, // Admin-created users have verified email
-                EmailVerificationToken = null,
-                EmailVerificationTokenExpiry = null
-            },
-            UserRoles =
-            [
-                new Domain.Entities.UserRole
-                {
-                    Id = userRoleId,
-                    UserId = userId,
-                    RoleId = role.Id
-                }
-            ],
-            UserPasswordReset = new UserPasswordReset
-            {
+            new() {
                 Id = UuidGenerator.GenerateUserId(),
                 UserId = userId,
-                PasswordResetToken = null,
-                PasswordResetTokenExpiry = null
+                RoleId = role.Id
             }
-        };
+        },
+        UserPasswordReset = new UserPasswordReset
+        {
+            Id = UuidGenerator.GenerateUserId(),
+            UserId = userId
+        }
+    };
 
-        var createdUser = await userRepository.CreateAsync(user);
-        logger.LogUserRegistered(createdUser.Username);
+    // 6. Persistencia
+    var createdUser = await userRepository.CreateAsync(user);
+    logger.LogInformation("Administrador creó exitosamente al usuario: {Username}", createdUser.Username);
 
-        return MapToUserResponseDto(createdUser);
-    }
+    return MapToUserResponseDto(createdUser);
+}
 
     public async Task<UserResponseDto?> UpdateUserByAdminAsync(string userId, UpdateUserByAdminDto updateUserByAdminDto)
     {
