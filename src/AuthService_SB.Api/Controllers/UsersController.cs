@@ -19,6 +19,25 @@ public class UsersController(IUserManagementService userManagementService) : Con
         return roles.Contains(RoleConstants.ADMIN_ROLE);
     }
 
+    /// <summary>
+    /// Obtiene todos los usuarios para la consola administrativa.
+    /// </summary>
+    /// <returns>Listado de usuarios.</returns>
+    [HttpGet]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    [ProducesResponseType(typeof(IReadOnlyList<UserResponseDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<UserResponseDto>>> GetAllUsers()
+    {
+        if (!await CurrentUserIsAdmin())
+        {
+            return StatusCode(403, new { success = false, message = "Forbidden" });
+        }
+
+        var users = await userManagementService.GetAllUsersAsync();
+        return Ok(users);
+    }
+
     [HttpPut("{userId}/role")]
     [Authorize]
     [EnableRateLimiting("ApiPolicy")]

@@ -25,6 +25,8 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddApiDocumentation();
+builder.Services.AddSecurityPolicies(builder.Configuration);
+builder.Services.AddSecurityOptions();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddRateLimitingPolicies();
 
@@ -68,13 +70,17 @@ app.UseSecurityHeaders(policies => policies
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Core middlewares
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+app.UseRouting();
 app.UseCors("DefaultCorsPolicy");
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireCors("DefaultCorsPolicy");
 
 app.MapHealthChecks("/health");
 
