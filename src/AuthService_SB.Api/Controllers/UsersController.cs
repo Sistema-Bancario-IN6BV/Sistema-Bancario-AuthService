@@ -57,11 +57,6 @@ public class UsersController(IUserManagementService userManagementService, IAuth
     [ProducesResponseType(typeof(IReadOnlyList<UserResponseDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<UserResponseDto>>> GetAllUsers()
     {
-        if (!await CurrentUserIsAdmin())
-        {
-            return StatusCode(403, new { success = false, message = "Forbidden" });
-        }
-
         var users = await userManagementService.GetAllUsersAsync();
         return Ok(users);
     }
