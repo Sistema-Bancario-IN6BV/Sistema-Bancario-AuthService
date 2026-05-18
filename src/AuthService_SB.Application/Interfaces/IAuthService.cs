@@ -12,5 +12,10 @@ public interface IAuthService
     Task<EmailResponseDto> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto);
     Task<EmailResponseDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     Task<UserResponseDto?> GetUserByIdAsync(string userId);
-
+    Task<bool> ChangePasswordAsync(string userId, ChangePasswordDto changePasswordDto);
+    Task<UserResponseDto?> UpdateUserProfileAsync(string userId, UpdateUserProfileDto updateUserProfileDto);
+    Task<UserResponseDto?> UpdateClientProfileAsync(string userId, UpdateClientProfileDto updateClientProfileDto);
+    Task<UserResponseDto?> CreateUserByAdminAsync(CreateUserByAdminDto createUserByAdminDto);
+    Task<UserResponseDto?> UpdateUserByAdminAsync(string userId, UpdateUserByAdminDto updateUserByAdminDto);
+    Task<bool> DeleteUserAsync(string userId);
 }

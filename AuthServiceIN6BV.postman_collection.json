@@ -1,0 +1,345 @@
+{
+  "info": {
+    "_postman_id": "5bb4e36f-6e7c-47e1-a2e3-c1ef8f826606",
+    "name": "AuthServiceIN6BV",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48083670",
+    "_collection_link": "https://go.postman.co/collection/48083670-5bb4e36f-6e7c-47e1-a2e3-c1ef8f826606?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Authentication Service (.NET)",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{authDotNetUrl}}/api/v1/health",
+              "host": [
+                "{{authDotNetUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.json().token) {",
+                  "    pm.environment.set('authToken', pm.response.json().token);",
+                  "    pm.environment.set('userId', pm.response.json().user.id);",
+                  "    pm.environment.set('userEmail', pm.response.json().user.email);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Eduardo André",
+                  "type": "text"
+                },
+                {
+                  "key": "surname",
+                  "value": "Rodríguez Ochoa",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "erodriguez",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "erodriguez-2024250@kinal.edu.gt",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "hola123@#",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "12345678",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePicture",
+                  "type": "file",
+                  "src": "/C:/Users/Cambiar Nombre/Downloads/neyma.webp"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:5127/api/v1/auth/register/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5127",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.json().token) {",
+                  "    pm.environment.set('authToken', pm.response.json().token);",
+                  "    pm.environment.set('userId', pm.response.json().userDetails.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"emailOrUsername\": \"erodriguez\",\n    \"password\": \"hola123@#\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5127/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5127",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"token\": \"RZgAgwwCs8clMn-reOSKZejtHVJqBXwfz6VgCjpfZcQ\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5127/api/v1/auth/verify-email",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5127",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "verify-email"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"erodriguez-2024250@kinal.edu.gt\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5127/api/v1/auth/resend-verification",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5127",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "resend-verification"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"erodriguez-2024250@kinal.edu.gt\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5127/api/v1/auth/forgot-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5127",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"token\": \"ag-FJvWyuyMhBBiKAvqgJ46Qvxk92wDp6hBO8NQhMhs\",\n    \"newPassword\": \"hola1234\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5127/api/v1/auth/reset-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5127",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3JfZUJKMjUzV2lqSFN5IiwianRpIjoiYmIyMmI2MzAtYWQxNS00MWU5LTkwZGUtYjg1ZmY2ZmY0NmZjIiwiaWF0IjoxNzcxOTIwOTUwLCJyb2xlIjoiVVNFUl9ST0xFIiwiZW1haWwiOiJlcm9kcmlndWV6LTIwMjQyNTBAa2luYWwuZWR1Lmd0IiwidXNlcm5hbWUiOiJlcm9kcmlndWV6IiwibmFtZSI6IkVkdWFyZG8gQW5kcsOpIFJvZHLDrWd1ZXogT2Nob2EiLCJwaG9uZSI6IjEyMzQ1Njc4Iiwic3RhdHVzIjoidHJ1ZSIsImV4cCI6MTc3MTkyMjQ1MCwiaXNzIjoiQXV0aFNlcnZpY2VPcGluaW9uIiwiYXVkIjoiQXBpT3BpbmlvbiJ9.8FU0y3i2HdYwMUm_g7nWC1iG7UhbZuBXrqM_gnUWkr4",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5220/api/v1/auth/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5220",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5220/api/v1/auth/update-username",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5220",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "update-username"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

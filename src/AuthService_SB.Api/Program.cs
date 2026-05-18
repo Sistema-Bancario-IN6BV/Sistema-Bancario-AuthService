@@ -25,10 +25,9 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddApiDocumentation();
-builder.Services.AddSecurityPolicies(builder.Configuration);
-builder.Services.AddSecurityOptions();
-builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddRateLimitingPolicies();
+builder.Services.AddJwtAuthentication(builder.Configuration);     
+builder.Services.AddSecurityPolicies(builder.Configuration); 
+builder.Services.AddRateLimitingPolicies();   
 
 var app = builder.Build();
 
@@ -41,7 +40,8 @@ if (app.Environment.IsDevelopment())
 
 // Add Serilog request logging
 app.UseSerilogRequestLogging();
-
+app.UseCors("DefaultCorsPolicy");   
+app.UseRouting();
 // Add Security Headers using NetEscapades package
 app.UseSecurityHeaders(policies => policies
     .AddDefaultSecurityHeaders()
