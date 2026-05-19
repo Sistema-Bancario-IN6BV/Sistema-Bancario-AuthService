@@ -70,13 +70,17 @@ app.UseSecurityHeaders(policies => policies
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Core middlewares
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+app.UseRouting();
 app.UseCors("DefaultCorsPolicy");
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireCors("DefaultCorsPolicy");
 
 app.MapHealthChecks("/health");
 
