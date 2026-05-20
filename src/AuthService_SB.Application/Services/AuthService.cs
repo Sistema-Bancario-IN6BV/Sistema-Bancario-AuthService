@@ -1,3 +1,4 @@
+//AuthService.cs
 using AuthService_SB.Application.DTOs;
 using AuthService_SB.Application.Interfaces;
 using AuthService_SB.Application.Exceptions;
@@ -466,6 +467,20 @@ public class AuthService(
             return null;
         }
 
+        // Update basic user fields
+        if (!string.IsNullOrEmpty(updateUserProfileDto.Name))
+        {
+            user.Name = updateUserProfileDto.Name;
+        }
+        if (!string.IsNullOrEmpty(updateUserProfileDto.Surname))
+        {
+            user.Surname = updateUserProfileDto.Surname;
+        }
+        if (!string.IsNullOrEmpty(updateUserProfileDto.Email))
+        {
+            user.Email = updateUserProfileDto.Email.ToLowerInvariant();
+        }
+
         // Update profile fields
         if (user.UserProfile != null)
         {
@@ -485,9 +500,19 @@ public class AuthService(
             {
                 user.UserProfile.MonthlyIncome = updateUserProfileDto.MonthlyIncome;
             }
-            if (!string.IsNullOrEmpty(updateUserProfileDto.ProfilePicture))
+
+            // Handle profile picture upload if provided
+            if (updateUserProfileDto.ProfilePicture != null && updateUserProfileDto.ProfilePicture.Size > 0)
             {
-                user.UserProfile.ProfilePicture = updateUserProfileDto.ProfilePicture;
+                var (isValid, errorMessage) = FileValidator.ValidateImage(updateUserProfileDto.ProfilePicture);
+                if (!isValid)
+                {
+                    throw new BusinessException(ErrorCodes.INVALID_FILE_FORMAT, errorMessage!);
+                }
+
+                var fileName = FileValidator.GenerateSecureFileName(updateUserProfileDto.ProfilePicture.FileName);
+                var profilePicturePath = await _cloudinaryService.UploadImageAsync(updateUserProfileDto.ProfilePicture, fileName);
+                user.UserProfile.ProfilePicture = profilePicturePath;
             }
         }
 
