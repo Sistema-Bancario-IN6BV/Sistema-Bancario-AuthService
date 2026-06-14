@@ -1,3 +1,4 @@
+//AuthController.cs
 using System;
 using AuthService_SB.Application.DTOs;
 using AuthService_SB.Application.DTOs.Email;
