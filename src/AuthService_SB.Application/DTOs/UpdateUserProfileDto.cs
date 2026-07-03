@@ -1,3 +1,6 @@
+//UpdateUserProfileDto.cs
+using AuthService_SB.Application.Interfaces;
+
 namespace AuthService_SB.Application.DTOs;
 
 /// <summary>
@@ -6,9 +9,29 @@ namespace AuthService_SB.Application.DTOs;
 public class UpdateUserProfileDto
 {
     /// <summary>
-    /// Ruta o URL de la foto de perfil.
+    /// Nombre del usuario.
     /// </summary>
-    public string ProfilePicture { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Apellido del usuario.
+    /// </summary>
+    public string Surname { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Correo electrónico del usuario.
+    /// </summary>
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Nombre de usuario.
+    /// </summary>
+    public string Username { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Archivo de foto de perfil.
+    /// </summary>
+    public IFileData? ProfilePicture { get; set; }
 
     /// <summary>
     /// Teléfono del usuario.
