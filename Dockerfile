@@ -17,6 +17,18 @@ RUN dotnet publish src/AuthService_SB.Api/AuthService_SB.Api.csproj \
     --output /app/publish \
     /p:UseAppHost=false
 
+FROM restore AS development
+WORKDIR /src
+COPY . .
+ENV ASPNETCORE_URLS=http://+:5127
+ENV ASPNETCORE_ENVIRONMENT=Development
+EXPOSE 5127
+CMD ["dotnet", "watch", "--project", "src/AuthService_SB.Api/AuthService_SB.Api.csproj", "run", "--urls", "http://+:5127"]
+
+# Kept last on purpose: builders that don't get an explicit --target (e.g.
+# Railway's `railway up` without a target set in railway.toml) build the
+# final stage in the file by default, and that must be `production`, not
+# the `dotnet watch` dev stage above.
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS production
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:5127
@@ -32,11 +44,3 @@ RUN mkdir -p /app/keys && chown -R $APP_UID:$APP_UID /app/keys
 EXPOSE 5127
 USER $APP_UID
 ENTRYPOINT ["dotnet", "AuthService_SB.Api.dll"]
-
-FROM restore AS development
-WORKDIR /src
-COPY . .
-ENV ASPNETCORE_URLS=http://+:5127
-ENV ASPNETCORE_ENVIRONMENT=Development
-EXPOSE 5127
-CMD ["dotnet", "watch", "--project", "src/AuthService_SB.Api/AuthService_SB.Api.csproj", "run", "--urls", "http://+:5127"]
