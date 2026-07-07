@@ -58,6 +58,10 @@ namespace AuthService_SB.Persistence.Migrations
                         .HasColumnType("character varying(16)")
                         .HasColumnName("id");
 
+                    b.Property<DateTime?>("AccountLockedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("account_locked_at");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -67,6 +71,14 @@ namespace AuthService_SB.Persistence.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)")
                         .HasColumnName("email");
+
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("failed_login_attempts");
+
+                    b.Property<DateTime?>("LockoutEndTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("lockout_end_time");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -196,6 +208,28 @@ namespace AuthService_SB.Persistence.Migrations
                         .HasColumnType("character varying(16)")
                         .HasColumnName("id");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("Dpi")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("character varying(13)")
+                        .HasColumnName("dpi");
+
+                    b.Property<string>("JobName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("job_name");
+
+                    b.Property<decimal>("MonthlyIncome")
+                        .HasColumnType("decimal(12, 2)")
+                        .HasColumnName("monthly_income");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(8)
@@ -218,6 +252,10 @@ namespace AuthService_SB.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_user_profiles");
+
+                    b.HasIndex("Dpi")
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_profiles_dpi");
 
                     b.HasIndex("UserId")
                         .IsUnique()

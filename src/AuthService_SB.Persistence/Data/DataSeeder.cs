@@ -2,12 +2,16 @@ using AuthService_SB.Domain.Entities;
 using AuthService_SB.Application.Services;
 using AuthService_SB.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuthService_SB.Persistence.Data;
 
 public static class DataSeeder
 {
-    public static async Task SeedAsync(ApplicationDbContext context)
+    // Roles must exist in every environment for role-based auth to work, but a
+    // default admin account with a guessable username==password must never be
+    // auto-created outside local development.
+    public static async Task SeedAsync(ApplicationDbContext context, bool isDevelopment, ILogger? logger = null)
     {
         if(!context.Roles.Any())
         {
@@ -31,6 +35,14 @@ public static class DataSeeder
 
         if(!await context.Users.AnyAsync())
         {
+            if (!isDevelopment)
+            {
+                logger?.LogWarning(
+                    "No users exist and this is not a Development environment: skipping default admin seed. " +
+                    "Create the first admin account explicitly (e.g. via a one-time admin CLI/migration step).");
+                return;
+            }
+
             var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == RoleConstants.ADMIN_ROLE);
             if(adminRole != null)
             {

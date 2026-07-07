@@ -61,7 +61,7 @@ public class UsersController(IUserManagementService userManagementService, IAuth
         return Ok(users);
     }
 
-    [HttpPut("{userId}/role")]
+    [HttpGet("{userId}")]
     [Authorize]
     [EnableRateLimiting("ApiPolicy")]
     public async Task<ActionResult<object>> GetUserById(string userId)
