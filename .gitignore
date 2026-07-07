@@ -61,8 +61,13 @@ appsettings.Production.json
 appsettings.Staging.json
 .env
 .env.*
+!.env.example
 secrets.json
 **/secrets/
+
+# ASP.NET Core Data Protection keys (machine-generated cryptographic material)
+keys/
+**/keys/
 
 # =========================
 # Database files
@@ -87,7 +92,6 @@ secrets.json
 docker-compose.override.yml
 docker-compose.*.yml
 *.dockerfile
-.dockerignore
 docker-data/
 *.tar
 
