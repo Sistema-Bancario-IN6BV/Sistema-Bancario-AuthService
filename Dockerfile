@@ -31,8 +31,8 @@ CMD ["dotnet", "watch", "--project", "src/AuthService_SB.Api/AuthService_SB.Api.
 # the `dotnet watch` dev stage above.
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS production
 WORKDIR /app
-ENV ASPNETCORE_URLS=http://+:5127
 ENV ASPNETCORE_ENVIRONMENT=Production
+ENV PORT=5127
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
@@ -43,4 +43,6 @@ COPY --from=build /app/publish .
 RUN mkdir -p /app/keys && chown -R $APP_UID:$APP_UID /app/keys
 EXPOSE 5127
 USER $APP_UID
-ENTRYPOINT ["dotnet", "AuthService_SB.Api.dll"]
+# Railway injects PORT at runtime and expects the app to bind to it, so the
+# URL is built in a shell rather than baked in via ENV ASPNETCORE_URLS.
+ENTRYPOINT ["/bin/sh", "-c", "ASPNETCORE_URLS=http://+:${PORT} exec dotnet AuthService_SB.Api.dll"]
