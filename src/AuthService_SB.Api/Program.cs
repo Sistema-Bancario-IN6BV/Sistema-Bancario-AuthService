@@ -6,6 +6,7 @@ using AuthService_SB.Api.ModelBinders;
 using Serilog;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -133,11 +134,12 @@ using (var scope = app.Services.CreateScope())
     {
         logger.LogInformation("Checking database connection...");
 
-        // Ensure database is created (similar to Sequelize sync in Node.js)
-        await context.Database.EnsureCreatedAsync();
+        // Apply pending EF Core migrations (EnsureCreated is incompatible with
+        // the Migrations API and would silently skip future schema changes).
+        await context.Database.MigrateAsync();
 
         logger.LogInformation("Database ready. Running seed data...");
-        await DataSeeder.SeedAsync(context);
+        await DataSeeder.SeedAsync(context, app.Environment.IsDevelopment(), logger);
 
         logger.LogInformation("Database initialization completed successfully");
     }

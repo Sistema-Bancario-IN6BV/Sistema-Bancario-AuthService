@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      ConnectionStrings__DefaultConnection: "Host=localhost;Database=authservice;Username=root;Password=admin;Port=5432"
+      JwtSettings__SecretKey: "ci-only-placeholder-secret-key-not-used-in-production"
+      CloudinarySettings__CloudName: "ci-placeholder"
+      CloudinarySettings__ApiKey: "ci-placeholder"
+      CloudinarySettings__ApiSecret: "ci-placeholder"
+      CloudinarySettings__BaseUrl: "https://res.cloudinary.com/ci-placeholder/image/upload/"
+      SmtpSettings__Username: "ci-placeholder@example.com"
+      SmtpSettings__Password: "ci-placeholder"
+      SmtpSettings__FromEmail: "ci-placeholder@example.com"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore AuthService_SB.sln
+
+      - name: Build
+        run: dotnet build AuthService_SB.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test AuthService_SB.sln --no-build --configuration Release --verbosity normal
