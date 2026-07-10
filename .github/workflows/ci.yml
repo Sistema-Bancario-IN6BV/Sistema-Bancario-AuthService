@@ -17,9 +17,8 @@ jobs:
       CloudinarySettings__ApiKey: "ci-placeholder"
       CloudinarySettings__ApiSecret: "ci-placeholder"
       CloudinarySettings__BaseUrl: "https://res.cloudinary.com/ci-placeholder/image/upload/"
-      SmtpSettings__Username: "ci-placeholder@example.com"
-      SmtpSettings__Password: "ci-placeholder"
-      SmtpSettings__FromEmail: "ci-placeholder@example.com"
+      ResendSettings__ApiKey: "ci-placeholder"
+      ResendSettings__FromEmail: "ci-placeholder@example.com"
 
     steps:
       - uses: actions/checkout@v4

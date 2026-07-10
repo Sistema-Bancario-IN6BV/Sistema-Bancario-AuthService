@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPasswordHashService, PasswordHashService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<ICloudinaryService, CloudinaryService>();
-        services.AddScoped<IEmailService, EmailService>();
+        services.AddHttpClient<IEmailService, EmailService>();
 
         services.AddHealthChecks();
 
