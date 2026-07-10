@@ -1,13 +1,12 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
 using AuthService_SB.Application.Interfaces;
 
 namespace AuthService_SB.Application.Services;
 
-public class EmailService(IConfiguration configuration, ILogger<EmailService> logger) : IEmailService
+public class EmailService(HttpClient httpClient, IConfiguration configuration, ILogger<EmailService> logger) : IEmailService
 {
     public async Task SendEmailVerificationAsync(string email, string username, string token)
     {
@@ -65,108 +64,59 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
         await SendEmailAsync(email, subject, body);
     }
 
+    // Uses the Resend HTTP API (port 443) instead of raw SMTP: outbound SMTP
+    // (25/465/587) from Railway's shared egress IP is silently dropped by
+    // Gmail's anti-abuse filtering, so MailKit connections to smtp.gmail.com
+    // always time out regardless of credentials.
     private async Task SendEmailAsync(string to, string subject, string body)
     {
-        var smtpSettings = configuration.GetSection("SmtpSettings");
+        var resendSettings = configuration.GetSection("ResendSettings");
+
+        var enabled = bool.Parse(resendSettings["Enabled"] ?? "true");
+        if (!enabled)
+        {
+            logger.LogInformation("Email disabled in configuration. Skipping send");
+            return;
+        }
+
+        var apiKey = resendSettings["ApiKey"];
+        var fromEmail = resendSettings["FromEmail"];
+        var fromName = resendSettings["FromName"];
+
+        if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(fromEmail))
+        {
+            logger.LogError("Resend settings are not properly configured");
+            throw new InvalidOperationException("Resend settings are not properly configured");
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails")
+        {
+            Headers = { Authorization = new AuthenticationHeaderValue("Bearer", apiKey) },
+            Content = JsonContent.Create(new
+            {
+                from = $"{fromName} <{fromEmail}>",
+                to = new[] { to },
+                subject,
+                html = body
+            })
+        };
 
         try
         {
-            // Verificar si el email está habilitado
-            var enabled = bool.Parse(smtpSettings["Enabled"] ?? "true");
-            if (!enabled)
+            var response = await httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
             {
-                logger.LogInformation("Email disabled in configuration. Skipping send");
-                return;
+                var responseBody = await response.Content.ReadAsStringAsync();
+                logger.LogError("Resend API returned {StatusCode}: {Body}", response.StatusCode, responseBody);
+                throw new InvalidOperationException($"Failed to send email: Resend API returned {response.StatusCode}");
             }
 
-            // Validar configuración
-            var host = smtpSettings["Host"];
-            var portString = smtpSettings["Port"];
-            var username = smtpSettings["Username"];
-            var password = smtpSettings["Password"];
-            var fromEmail = smtpSettings["FromEmail"];
-            var fromName = smtpSettings["FromName"];
-
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                logger.LogError("SMTP settings are not properly configured");
-                throw new InvalidOperationException("SMTP settings are not properly configured");
-            }
-
-            // Avoid logging sensitive SMTP details
-
-            var port = int.Parse(portString ?? "587");
-
-            using var client = new SmtpClient();
-
-            // Configurar timeout
-            var timeoutMs = int.Parse(smtpSettings["Timeout"] ?? "30000");
-            client.Timeout = timeoutMs;
-
-            // FIX: Bypass SSL (Cloudinary, etc.)
-            client.CheckCertificateRevocation = false;
-            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-            try
-            {
-                // Verificar configuración de SSL implícito
-                var useImplicitSsl = bool.Parse(smtpSettings["UseImplicitSsl"] ?? "false");
-
-                // Configuración específica por puerto y SSL
-                if (useImplicitSsl || port == 465)
-                {
-                    await client.ConnectAsync(host, port, SecureSocketOptions.SslOnConnect);
-                }
-                else if (port == 587)
-                {
-                    await client.ConnectAsync(host, port, SecureSocketOptions.StartTls);
-                }
-                else
-                {
-                    await client.ConnectAsync(host, port, SecureSocketOptions.Auto);
-                }
-
-                // Autenticación
-                await client.AuthenticateAsync(username, password);
-
-                // Crear mensaje con MimeKit
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(fromName, fromEmail));
-                message.To.Add(new MailboxAddress("", to));
-                message.Subject = subject;
-                message.Body = new TextPart("html") { Text = body };
-
-                // Enviar
-                await client.SendAsync(message);
-                logger.LogInformation("Email sent successfully");
-
-                await client.DisconnectAsync(true);
-                logger.LogInformation("Email pipeline completed");
-            }
-            catch (MailKit.Security.AuthenticationException authEx)
-            {
-                logger.LogError(authEx, "Gmail authentication failed. Check app password.");
-                throw new InvalidOperationException($"Gmail authentication failed: {authEx.Message}. Please check your app password.", authEx);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to send email");
-                throw;
-            }
-            logger.LogInformation("Email processed");
+            logger.LogInformation("Email sent successfully");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not InvalidOperationException)
         {
             logger.LogError(ex, "Failed to send email");
-
-            // Verificar si usar fallback
-            var useFallback = bool.Parse(smtpSettings["UseFallback"] ?? "false");
-            if (useFallback)
-            {
-                logger.LogWarning("Using email fallback");
-                return; // No fallar, solo logear
-            }
-
             throw new InvalidOperationException($"Failed to send email: {ex.Message}", ex);
         }
     }

@@ -33,9 +33,8 @@ services:
       CloudinarySettings__ApiKey: ${CLOUDINARY_API_KEY}
       CloudinarySettings__ApiSecret: ${CLOUDINARY_API_SECRET}
       CloudinarySettings__BaseUrl: ${CLOUDINARY_BASE_URL}
-      SmtpSettings__Username: ${SMTP_USERNAME}
-      SmtpSettings__Password: ${SMTP_PASSWORD}
-      SmtpSettings__FromEmail: ${SMTP_FROM_EMAIL}
+      ResendSettings__ApiKey: ${RESEND_API_KEY}
+      ResendSettings__FromEmail: ${RESEND_FROM_EMAIL}
     ports:
       - "5127:5127"
 
